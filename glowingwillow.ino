@@ -14,7 +14,7 @@
 #define TRUNK_PIXEL_COUNT 100
 
 #define BRANCH_STRIP_COUNT 6
-#define BRANCH_PIXEL_COUNT 72
+#define BRANCH_PIXEL_COUNT 90
 
 // Effect settings
 #define SATURATION 255
