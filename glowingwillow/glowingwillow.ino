@@ -58,7 +58,7 @@ void loop() {
   //FastLED.delay(5000);
   //trunk_single_color(BLACK);
   //branch_single_color(BLACK);
-  //test_sine();
+  test_sine();
   // tree_rainbow();
   // tree_fade_color(random(255), 255, 0);
 
@@ -66,8 +66,8 @@ void loop() {
   // branch_helicopter_single_color(171, 150);
 
   //run_sparkle();
-  tree_random();
-  FastLED.delay(250);
+  //tree_random();
+  //FastLED.delay(250);
 }
 
 // -- Transform functions ------------------------------------------------
@@ -144,7 +144,7 @@ void test_sine() {
   //set parameters
   float amplitude = 1; //0...1 -> max brightness
   float freq_amp_mod = 0; //amplitude/brightness modulation [1/s]
-  float wavelength = 12.5;//width of full sine wave along the strip [px]
+  float wavelength = 200;//width of full sine wave along the strip [px]
   float phase_offset = wavelength/4.0;//wavelength*3.0/4.0; //offset of sine at start [px]
   float phase_shift_speed = 10;//how fast sine moves along the strip [px/s]
 
@@ -153,7 +153,7 @@ void test_sine() {
   float phase_shift_speed_b = 12;//how fast sine moves along the strip [px/s]
  
   //set trunk
-  phase_offset = wavelength/4.0;
+  phase_offset = 0;
   for(uint8_t curr_pixel=0; curr_pixel<TRUNK_PIXEL_COUNT/2; curr_pixel++) {
     for (uint8_t j=0; j<4; j++) {
 
@@ -161,10 +161,10 @@ void test_sine() {
     }          
   }
  //set branches
- phase_offset = wavelength/4.0+2;//offset correction for leds in holder
+ phase_offset = -50+2;//offset correction for leds in holder
  for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
   for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
-    branch_leds[i][j] = CHSV(8, 255, 0+int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed, wavelength)));
+    branch_leds[i][j] = CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_b, wavelength)));
   }
  }
  //show
