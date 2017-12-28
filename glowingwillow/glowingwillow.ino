@@ -52,10 +52,11 @@ void loop() {
   trunk_rainbow_wipe();
   branch_rainbow_wipe();
   //branch_helicopter_single_color(GREEN,100);
-  branch_helicopter_rainbow(40,1,10);//params: nr of rotations total, delay per branch step, color increase per branch step
+  //branch_helicopter_rainbow(40,1,10);//params: nr of rotations total, delay per branch step, color increase per branch step
+  FastLED.delay(5000);
   trunk_single_color(BLACK);
   branch_single_color(BLACK);
-  FastLED.delay(1000);
+  
   
 }
 
