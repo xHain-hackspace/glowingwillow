@@ -32,6 +32,7 @@
 #define BLUE CHSV(171, SATURATION, VALUE)
 #define PINK CHSV(213, SATURATION, VALUE)
 #define BLACK CHSV(0, 0, 0)
+#define WHITE CRGB(255, 255, 255)
 
 CRGB trunk_leds[TRUNK_STRIP_COUNT][TRUNK_PIXEL_COUNT];
 CRGB branch_leds[BRANCH_STRIP_COUNT][BRANCH_PIXEL_COUNT];
@@ -57,7 +58,7 @@ void loop() {
   //FastLED.delay(5000);
   //trunk_single_color(BLACK);
   //branch_single_color(BLACK);
-  test_sine();
+  //test_sine();
   // tree_rainbow();
   // tree_fade_color(random(255), 255, 0);
 
@@ -65,7 +66,8 @@ void loop() {
   // branch_helicopter_single_color(171, 150);
 
   //run_sparkle();
-
+  tree_random();
+  FastLED.delay(250);
 }
 
 // -- Transform functions ------------------------------------------------
@@ -141,17 +143,21 @@ float wave_propagation(float pixel_pos,float phase_offset, float phase_shift_spe
 void test_sine() {
   //set parameters
   float amplitude = 1; //0...1 -> max brightness
-  float freq_amp_mod = 0.1; //amplitude/brightness modulation [1/s]
+  float freq_amp_mod = 0; //amplitude/brightness modulation [1/s]
   float wavelength = 12.5;//width of full sine wave along the strip [px]
   float phase_offset = wavelength/4.0;//wavelength*3.0/4.0; //offset of sine at start [px]
   float phase_shift_speed = 10;//how fast sine moves along the strip [px/s]
+
+  float phase_shift_speed_r = 10;//how fast sine moves along the strip [px/s]
+  float phase_shift_speed_g = 11;//how fast sine moves along the strip [px/s]
+  float phase_shift_speed_b = 12;//how fast sine moves along the strip [px/s]
  
   //set trunk
   phase_offset = wavelength/4.0;
   for(uint8_t curr_pixel=0; curr_pixel<TRUNK_PIXEL_COUNT/2; curr_pixel++) {
     for (uint8_t j=0; j<4; j++) {
 
-      set_trunk_led(j, curr_pixel, CHSV(8, 255, 0+int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed, wavelength))));
+      set_trunk_led(j, curr_pixel, CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_b, wavelength))));
     }          
   }
  //set branches
@@ -221,6 +227,21 @@ void branch_rainbow_wipe() {
 //
 // Whole tree
 //
+
+void tree_random(){
+    for(int i=0;i<TRUNK_STRIP_COUNT;i++){
+    for(int j=0;j<TRUNK_PIXEL_COUNT;j++){
+      trunk_leds[i][j]=CHSV(random(255),255,random(2)*255);
+    }
+  }
+
+ for(int m=0;m<BRANCH_STRIP_COUNT;m++){
+  for(int n=0;n<BRANCH_PIXEL_COUNT;n++){
+      branch_leds[m][n]=CHSV(random(255),255,random(2)*255);
+    }
+  }
+  FastLED.show();
+}
 
 void tree_rainbow() {
   trunk_rainbow_wipe();
