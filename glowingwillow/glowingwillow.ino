@@ -309,5 +309,33 @@ void run_sparkle() {
   }
 }
 
+void police() {
+  // 2x 50ms blue trunk blinkie
+  trunk_single_color(BLUE);
+  FastLED.show();
+  FastLED.delay(50)
+  tree_off();
+  trunk_single_color(BLUE);
+  FastLED.show();
+  FastLED.delay(50)
+  tree_off();
+  
+  // 300 ms of black void
+  FastLED.delay(300);
+  
+  // 2x 50ms blue branch blinkie
+  branch_single_color(BLUE);
+  FastLED.show();
+  FastLED.delay(50)
+  tree_off();
+  branch_single_color(BLUE);
+  FastLED.show();
+  FastLED.delay(50)
+  tree_off();
+  
+  // 300 ms of black void
+  FastLED.delay(300);
+}
+
 
 
