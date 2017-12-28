@@ -23,7 +23,7 @@
 #define DELAY 10
 
 // sparke
-#define SPARKLE_COUNT 10
+#define SPARKLE_COUNT 20
 
 // colors
 #define RED CHSV(0, SATURATION, VALUE)
@@ -67,8 +67,8 @@ void loop() {
   // trunk_single_color(PINK);
   // branch_helicopter_single_color(171, 150);
 
-  trunk_wave(BLUE);
-  branch_sparkle();
+  tree_wave(180, 50, 120);
+  branch_sparkle(5, 180, 500);
 
   FastLED.show();
 
@@ -170,8 +170,6 @@ void trunk_rainbow_wipe() {
   }
 }
 
-
-
 // -- BRANCH ------------------------------------------------
 
 void branch_color_wipe(CRGB color) {
@@ -234,25 +232,21 @@ struct Sparkle {
 
 Sparkle sparkles[SPARKLE_COUNT];
 
-void branch_sparkle() {
-  int fade_speed = 1000; // smaller is quicker
-
-  int sparkle_min_value = 5;
-  int sparkle_max_value = 255;
+void branch_sparkle(int min_value, int max_value, int fade_speed) {
 
   int now = millis();
 
   for (int i=0; i<SPARKLE_COUNT; i++) {
-    if (sparkles[i].value <= sparkle_min_value) {
+    if (sparkles[i].value <= min_value) {
       branch_leds[sparkles[i].branch][sparkles[i].led] = BLACK;
 
       // new sparkle
       sparkles[i].led = random(BRANCH_PIXEL_COUNT);
       sparkles[i].branch = random(BRANCH_STRIP_COUNT);
-      sparkles[i].value = random(sparkle_max_value);
+      sparkles[i].value = random(max_value);
       sparkles[i].start_time = now;
     } else {
-      sparkles[i].value = sparkles[i].value - (now - sparkles[i].start_time) * fade_speed;
+      sparkles[i].value = sparkles[i].value - (now - sparkles[i].start_time) / fade_speed;
     }
 
     branch_leds[sparkles[i].branch][sparkles[i].led] = CHSV(0, 0, sparkles[i].value);
@@ -305,6 +299,26 @@ void tree_fade_color(int hue, int saturation, int delay) {
     FastLED.delay(delay);
   }
 }
+
+void tree_wave(int hue, int min_value, int max_value) {
+  int saturation = 255;
+  int value = 0;
+
+  for(int i=0; i<4; i++) {
+    for(int j=0; j<TRUNK_PIXEL_COUNT/2; j++) {
+      value = min_value + wave_propagation(j, 0, 8, 25) * (max_value-min_value);
+      set_trunk_led(i, j, CHSV(hue, saturation, value));
+    }
+  }
+
+  for (int i=0; i<BRANCH_STRIP_COUNT; i++) {
+    for(int j=0; j<BRANCH_PIXEL_COUNT; j++) {
+      value = min_value + wave_propagation(j, -50, 8, 25) * (max_value-min_value);
+      branch_leds[i][j] = CHSV(hue, saturation, value);
+    }
+  }
+}
+
 
 
 
