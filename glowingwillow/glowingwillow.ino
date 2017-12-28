@@ -67,7 +67,7 @@ void loop() {
   // trunk_single_color(PINK);
   // branch_helicopter_single_color(171, 150);
 
-  // run_sparkle();
+  run_sparkle();
 
 }
 
@@ -152,14 +152,14 @@ void test_sine() {
   float phase_shift_speed_r = 10;//how fast sine moves along the strip [px/s]
   float phase_shift_speed_g = 11;//how fast sine moves along the strip [px/s]
   float phase_shift_speed_b = 12;//how fast sine moves along the strip [px/s]
- 
+
   //set trunk
   phase_offset = 0;
   for(uint8_t curr_pixel=0; curr_pixel<TRUNK_PIXEL_COUNT/2; curr_pixel++) {
     for (uint8_t j=0; j<4; j++) {
 
       set_trunk_led(j, curr_pixel, CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_b, wavelength))));
-    }          
+    }
   }
  //set branches
  phase_offset = -50+2;//offset correction for leds in holder
@@ -285,11 +285,10 @@ struct Sparkle {
 Sparkle sparkles[SPARKLE_COUNT];
 
 void run_sparkle() {
+  int fade_speed = 100; // smaller is quicker
 
-  int sparkle_min_value = 50;
-  int sparkle_max_value = 200;
-
-  int fade_speed = 10;
+  int sparkle_min_value = 5;
+  int sparkle_max_value = 255;
 
   int now = millis();
 
