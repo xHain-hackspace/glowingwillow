@@ -67,7 +67,8 @@ void loop() {
   // trunk_single_color(PINK);
   // branch_helicopter_single_color(171, 150);
 
-  run_sparkle();
+  trunk_wave(BLUE);
+  branch_sparkle();
 
   FastLED.show();
 
@@ -95,40 +96,7 @@ void set_branch_led(int branch, int led, CRGB color) {
   }
 }
 
-// -- Effects ------------------------------------------------
-
-//
-// TRUNK
-//
-void trunk_color_wipe(CRGB color) {
-  for(int i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
-    for(int j=0; j<4; j++) {
-      set_trunk_led(j, i, color);
-    }
-    FastLED.show();
-    FastLED.delay(DELAY);
-  }
-}
-
-void trunk_single_color(CRGB color) {
-  for(int i=0; i<TRUNK_STRIP_COUNT; i++) {
-    for (int j=0; j<TRUNK_PIXEL_COUNT; j++) {
-      trunk_leds[i][j] = color;
-    }
-  }
-}
-
-void trunk_rainbow_wipe() {
-  for(int i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
-    for (int j=0; j<4; j++) {
-      set_trunk_led(j, i, CHSV(i*5, SATURATION, VALUE));
-    }
-    FastLED.show();
-    FastLED.delay(DELAY);
-  }
-}
-
-////helper functions for sine calculation////
+// -- sine calculation ------------------------------------------------
 
 //returns amplitude modulation term (0...1) based on system time and frequency parameter [1/s]
 float amplitude_modulation(float freq_amp_mod){
@@ -172,9 +140,40 @@ void test_sine() {
  }
 }
 
-//
-// BRANCH
-//
+// -- TRUNK ------------------------------------------------
+
+void trunk_color_wipe(CRGB color) {
+  for(int i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
+    for(int j=0; j<4; j++) {
+      set_trunk_led(j, i, color);
+    }
+    FastLED.show();
+    FastLED.delay(DELAY);
+  }
+}
+
+void trunk_single_color(CRGB color) {
+  for(int i=0; i<TRUNK_STRIP_COUNT; i++) {
+    for (int j=0; j<TRUNK_PIXEL_COUNT; j++) {
+      trunk_leds[i][j] = color;
+    }
+  }
+}
+
+void trunk_rainbow_wipe() {
+  for(int i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
+    for (int j=0; j<4; j++) {
+      set_trunk_led(j, i, CHSV(i*5, SATURATION, VALUE));
+    }
+    FastLED.show();
+    FastLED.delay(DELAY);
+  }
+}
+
+
+
+// -- BRANCH ------------------------------------------------
+
 void branch_color_wipe(CRGB color) {
   for(int i=0; i<BRANCH_PIXEL_COUNT; i++) {
     for(int j=0; j<BRANCH_STRIP_COUNT; j++) {
@@ -225,9 +224,42 @@ void branch_rainbow_wipe() {
   }
 }
 
-//
-// Whole tree
-//
+// sparkle
+struct Sparkle {
+  int start_time;
+  int led;
+  int branch;
+  int value;
+};
+
+Sparkle sparkles[SPARKLE_COUNT];
+
+void branch_sparkle() {
+  int fade_speed = 1000; // smaller is quicker
+
+  int sparkle_min_value = 5;
+  int sparkle_max_value = 255;
+
+  int now = millis();
+
+  for (int i=0; i<SPARKLE_COUNT; i++) {
+    if (sparkles[i].value <= sparkle_min_value) {
+      branch_leds[sparkles[i].branch][sparkles[i].led] = BLACK;
+
+      // new sparkle
+      sparkles[i].led = random(BRANCH_PIXEL_COUNT);
+      sparkles[i].branch = random(BRANCH_STRIP_COUNT);
+      sparkles[i].value = random(sparkle_max_value);
+      sparkles[i].start_time = now;
+    } else {
+      sparkles[i].value = sparkles[i].value - (now - sparkles[i].start_time) * fade_speed;
+    }
+
+    branch_leds[sparkles[i].branch][sparkles[i].led] = CHSV(0, 0, sparkles[i].value);
+  }
+}
+
+// -- Whole tree ------------------------------------------------
 
 void tree_random(){
     for(int i=0;i<TRUNK_STRIP_COUNT;i++){
@@ -274,40 +306,8 @@ void tree_fade_color(int hue, int saturation, int delay) {
   }
 }
 
-// sparkle
-struct Sparkle {
-  int start_time;
-  int led;
-  int branch;
-  int value;
-};
 
-Sparkle sparkles[SPARKLE_COUNT];
 
-void run_sparkle() {
-  int fade_speed = 1000; // smaller is quicker
-
-  int sparkle_min_value = 5;
-  int sparkle_max_value = 255;
-
-  int now = millis();
-
-  for (int i=0; i<SPARKLE_COUNT; i++) {
-    if (sparkles[i].value <= sparkle_min_value) {
-      branch_leds[sparkles[i].branch][sparkles[i].led] = BLACK;
-
-      // new sparkle
-      sparkles[i].led = random(BRANCH_PIXEL_COUNT);
-      sparkles[i].branch = random(BRANCH_STRIP_COUNT);
-      sparkles[i].value = random(sparkle_max_value);
-      sparkles[i].start_time = now;
-    } else {
-      sparkles[i].value = sparkles[i].value - (now - sparkles[i].start_time) * fade_speed;
-    }
-
-    branch_leds[sparkles[i].branch][sparkles[i].led] = CHSV(0, 0, sparkles[i].value);
-  }
-}
 
 
 
