@@ -46,7 +46,11 @@ void setup() {
 
 void loop() {
   // tree_rainbow();
-  tree_fade_color(random(255), 255, 0);
+  // tree_fade_color(random(255), 255, 0);
+  trunk_single_color(PINK);
+  FastLED.show();
+  branch_helicopter_single_color(171, 150);
+
 
 
 }
@@ -55,7 +59,7 @@ void loop() {
 // Used to select individual leds on the tree, translates the hardware wiring
 // to the actual positions on the tree
 
-void set_trunk_led(uint8_t trunk, uint8_t led, CRGB color) {
+void set_trunk_led(int trunk, int led, CRGB color) {
   if(trunk < 2) {
     trunk_leds[trunk][led] = color;
   } else {
@@ -63,8 +67,14 @@ void set_trunk_led(uint8_t trunk, uint8_t led, CRGB color) {
   }
 }
 
-void set_branch_led(uint8_t branch, uint8_t led, CRGB color) {
+void set_branch_led(int branch, int led, CRGB color) {
+  if(branch < 0) {
+    set_branch_led(branch + BRANCH_STRIP_COUNT, led, color);
+  } else if(branch < BRANCH_STRIP_COUNT) {
     branch_leds[branch][led] = color;
+  } else {
+    set_branch_led(branch - BRANCH_STRIP_COUNT, led, color);
+  }
 }
 
 // -- Effects ------------------------------------------------
@@ -73,8 +83,8 @@ void set_branch_led(uint8_t branch, uint8_t led, CRGB color) {
 // TRUNK
 //
 void trunk_color_wipe(CRGB color) {
-  for(uint8_t i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
-    for(uint8_t j=0; j<4; j++) {
+  for(int i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
+    for(int j=0; j<4; j++) {
       set_trunk_led(j, i, color);
     }
     FastLED.show();
@@ -83,16 +93,16 @@ void trunk_color_wipe(CRGB color) {
 }
 
 void trunk_single_color(CRGB color) {
-  for(uint8_t i=0; i<TRUNK_STRIP_COUNT; i++) {
-    for (uint8_t j=0; j<TRUNK_PIXEL_COUNT; j++) {
+  for(int i=0; i<TRUNK_STRIP_COUNT; i++) {
+    for (int j=0; j<TRUNK_PIXEL_COUNT; j++) {
       trunk_leds[i][j] = color;
     }
   }
 }
 
 void trunk_rainbow_wipe() {
-  for(uint8_t i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
-    for (uint8_t j=0; j<4; j++) {
+  for(int i=0; i<TRUNK_PIXEL_COUNT/2; i++) {
+    for (int j=0; j<4; j++) {
       set_trunk_led(j, i, CHSV(i*5, SATURATION, VALUE));
     }
     FastLED.show();
@@ -104,8 +114,8 @@ void trunk_rainbow_wipe() {
 // BRANCH
 //
 void branch_color_wipe(CRGB color) {
-  for(uint8_t i=0; i<BRANCH_PIXEL_COUNT; i++) {
-    for(uint8_t j=0; j<BRANCH_STRIP_COUNT; j++) {
+  for(int i=0; i<BRANCH_PIXEL_COUNT; i++) {
+    for(int j=0; j<BRANCH_STRIP_COUNT; j++) {
       set_trunk_led(j, i, color);
     }
     FastLED.show();
@@ -114,35 +124,38 @@ void branch_color_wipe(CRGB color) {
 }
 
 void branch_single_color(CRGB color) {
-  for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
-    for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
+  for(int i=0; i<BRANCH_STRIP_COUNT; i++) {
+    for (int j=0; j<BRANCH_PIXEL_COUNT; j++) {
       branch_leds[i][j] = color;
     }
   }
 }
 
 //light one branch at a time, options; color, delay per branch
-void branch_helicopter_single_color(CRGB color, int heli_delay) {
-  for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
-    branch_single_color(BLACK);
-    for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
-      branch_leds[i][j] = color;
+void branch_helicopter_single_color(int hue, int delay) {
+  for(int i=0; i<BRANCH_STRIP_COUNT; i++) {
+    // branch_single_color(BLACK);
+    for (int j=0; j<BRANCH_PIXEL_COUNT; j++) {
+      set_branch_led(i, j, CHSV(hue, SATURATION, 255));
+      set_branch_led(i-1, j, CHSV(hue, SATURATION, 150));
+      set_branch_led(i-2, j, CHSV(hue, SATURATION, 50));
+      set_branch_led(i-3, j, BLACK);
     }
     FastLED.show();
-    FastLED.delay(heli_delay);
+    FastLED.delay(delay);
   }
 }
 
 //light one branch in helicopter fashion, changing color for every branch, params: nr of rotations total, delay per branch step, color increase per branch step
-void branch_helicopter_rainbow(int rotations, int branch_delay, int color_speed){
-  for (int current_branch=0;current_branch<rotations;current_branch++){
-    branch_helicopter_single_color(CHSV((rotations*BRANCH_STRIP_COUNT+current_branch)*color_speed, SATURATION, VALUE),branch_delay);
-  }
-}
+// void branch_helicopter_rainbow(int rotations, int branch_delay, int color_speed){
+//   for (int current_branch=0;current_branch<rotations;current_branch++){
+//     branch_helicopter_single_color(CHSV((rotations*BRANCH_STRIP_COUNT+current_branch)*color_speed, SATURATION, VALUE),branch_delay);
+//   }
+// }
 
 void branch_rainbow_wipe() {
-  for(uint8_t i=0; i<BRANCH_PIXEL_COUNT; i++) {
-    for (uint8_t j=0; j<BRANCH_STRIP_COUNT; j++) {
+  for(int i=0; i<BRANCH_PIXEL_COUNT; i++) {
+    for (int j=0; j<BRANCH_STRIP_COUNT; j++) {
       set_branch_led(j, i, CHSV(i*5, SATURATION, VALUE));
     }
     FastLED.show();
