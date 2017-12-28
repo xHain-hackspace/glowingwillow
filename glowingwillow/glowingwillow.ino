@@ -11,8 +11,6 @@
 #define BRANCH_PIN_5 14 // Branch pointing to tents 1    (Branch 7)
 #define BRANCH_PIN_6 12 // Branch pointing to tents 2    (Branch 12)
 
-// Todo richtigen PIN Anschluss finden
-
 #define TRUNK_STRIP_COUNT 2
 #define TRUNK_PIXEL_COUNT 100
 
@@ -43,21 +41,14 @@ void setup() {
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_3>(branch_leds[2], BRANCH_PIXEL_COUNT);
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_4>(branch_leds[3], BRANCH_PIXEL_COUNT);
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_5>(branch_leds[4], BRANCH_PIXEL_COUNT);
-
-  // Todo richtigen PIN Anschluss finden
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_6>(branch_leds[5], BRANCH_PIXEL_COUNT);
 }
 
 void loop() {
-  trunk_rainbow_wipe();
-  branch_rainbow_wipe();
-  //branch_helicopter_single_color(GREEN,100);
-  //branch_helicopter_rainbow(40,1,10);//params: nr of rotations total, delay per branch step, color increase per branch step
-  FastLED.delay(5000);
-  trunk_single_color(BLACK);
-  branch_single_color(BLACK);
-  
-  
+  // tree_rainbow();
+  tree_fade_color(random(255), 255, 0);
+
+
 }
 
 // -- Transform functions ------------------------------------------------
@@ -75,8 +66,6 @@ void set_trunk_led(uint8_t trunk, uint8_t led, CRGB color) {
 void set_branch_led(uint8_t branch, uint8_t led, CRGB color) {
     branch_leds[branch][led] = color;
 }
-
-// void set_leaf_led(uint8_t leaf, uint8_t led, CRGB color)
 
 // -- Effects ------------------------------------------------
 
@@ -99,7 +88,6 @@ void trunk_single_color(CRGB color) {
       trunk_leds[i][j] = color;
     }
   }
-  FastLED.show();
 }
 
 void trunk_rainbow_wipe() {
@@ -131,7 +119,6 @@ void branch_single_color(CRGB color) {
       branch_leds[i][j] = color;
     }
   }
-  FastLED.show();
 }
 
 //light one branch at a time, options; color, delay per branch
@@ -143,7 +130,7 @@ void branch_helicopter_single_color(CRGB color, int heli_delay) {
     }
     FastLED.show();
     FastLED.delay(heli_delay);
-  }  
+  }
 }
 
 //light one branch in helicopter fashion, changing color for every branch, params: nr of rotations total, delay per branch step, color increase per branch step
@@ -162,4 +149,39 @@ void branch_rainbow_wipe() {
     FastLED.delay(DELAY);
   }
 }
+
+//
+// Whole tree
+//
+
+void tree_rainbow() {
+  trunk_rainbow_wipe();
+  branch_rainbow_wipe();
+  FastLED.delay(5000);
+  trunk_single_color(BLACK);
+  branch_single_color(BLACK);
+}
+
+void tree_off() {
+  trunk_single_color(BLACK);
+  branch_single_color(BLACK);
+  FastLED.show();
+}
+
+void tree_fade_color(int hue, int saturation, int delay) {
+  for(int i=50; i<200; i+=5) {
+    trunk_single_color(CHSV(hue, saturation, i));
+    branch_single_color(CHSV(hue, saturation, i));
+    FastLED.show();
+    FastLED.delay(delay);
+  }
+
+  for(int i=200; i>50; i-=5) {
+    trunk_single_color(CHSV(hue, saturation, i));
+    branch_single_color(CHSV(hue, saturation, i));
+    FastLED.show();
+    FastLED.delay(delay);
+  }
+}
+
 
