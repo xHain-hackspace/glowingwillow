@@ -4,12 +4,12 @@
 // strip config
 #define TRUNK_PIN_1 26
 #define TRUNK_PIN_2 25
-#define BRANCH_PIN_1 12 // Branch 6
-#define BRANCH_PIN_2 27 // Branch 
-#define BRANCH_PIN_3 4  // Branch 3
-#define BRANCH_PIN_4 13 // Branch 8
-#define BRANCH_PIN_5 14 // Branch 7
-#define BRANCH_PIN_6 15 // Branch 2
+#define BRANCH_PIN_1 15 // Branch pointing to assembly   (Branch 2)
+#define BRANCH_PIN_2 27 // Branch pointing to led drum 1 (Branch ?)
+#define BRANCH_PIN_3 4  // Branch pointing to led drum 2 (Branch 3)
+#define BRANCH_PIN_4 13 // Branch pointing to laser wall (Branch 8)
+#define BRANCH_PIN_5 14 // Branch pointing to tents 1    (Branch 7)
+#define BRANCH_PIN_6 12 // Branch pointing to tents 2    (Branch 12)
 
 // Todo richtigen PIN Anschluss finden
 
@@ -19,7 +19,7 @@
 #define BRANCH_STRIP_COUNT 6
 #define BRANCH_PIXEL_COUNT 90
 
-// Effect settings
+// Rainbow Effect settings
 #define SATURATION 255
 #define VALUE 255
 #define DELAY 10
@@ -51,8 +51,12 @@ void setup() {
 void loop() {
   trunk_rainbow_wipe();
   branch_rainbow_wipe();
+  //branch_helicopter_single_color(GREEN,100);
+  branch_helicopter_rainbow(40,1,10);//params: nr of rotations total, delay per branch step, color increase per branch step
   trunk_single_color(BLACK);
   branch_single_color(BLACK);
+  FastLED.delay(1000);
+  
 }
 
 // -- Transform functions ------------------------------------------------
@@ -127,6 +131,25 @@ void branch_single_color(CRGB color) {
     }
   }
   FastLED.show();
+}
+
+//light one branch at a time, options; color, delay per branch
+void branch_helicopter_single_color(CRGB color, int heli_delay) {
+  for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
+    branch_single_color(BLACK);
+    for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
+      branch_leds[i][j] = color;
+    }
+    FastLED.show();
+    FastLED.delay(heli_delay);
+  }  
+}
+
+//light one branch in helicopter fashion, changing color for every branch, params: nr of rotations total, delay per branch step, color increase per branch step
+void branch_helicopter_rainbow(int rotations, int branch_delay, int color_speed){
+  for (int current_branch=0;current_branch<rotations;current_branch++){
+    branch_helicopter_single_color(CHSV((rotations*BRANCH_STRIP_COUNT+current_branch)*color_speed, SATURATION, VALUE),branch_delay);
+  }
 }
 
 void branch_rainbow_wipe() {
