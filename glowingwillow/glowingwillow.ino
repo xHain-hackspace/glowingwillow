@@ -69,6 +69,8 @@ void loop() {
 
   run_sparkle();
 
+  FastLED.show();
+
 }
 
 // -- Transform functions ------------------------------------------------
@@ -168,8 +170,6 @@ void test_sine() {
     branch_leds[i][j] = CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_b, wavelength)));
   }
  }
- //show
- FastLED.show();
 }
 
 //
@@ -285,7 +285,7 @@ struct Sparkle {
 Sparkle sparkles[SPARKLE_COUNT];
 
 void run_sparkle() {
-  int fade_speed = 100; // smaller is quicker
+  int fade_speed = 1000; // smaller is quicker
 
   int sparkle_min_value = 5;
   int sparkle_max_value = 255;
@@ -307,7 +307,6 @@ void run_sparkle() {
 
     branch_leds[sparkles[i].branch][sparkles[i].led] = CHSV(0, 0, sparkles[i].value);
   }
-  FastLED.show();
 }
 
 
