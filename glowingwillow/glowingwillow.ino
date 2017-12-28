@@ -49,13 +49,14 @@ void setup() {
 }
 
 void loop() {
-  trunk_rainbow_wipe();
-  branch_rainbow_wipe();
+  //trunk_rainbow_wipe();
+  //branch_rainbow_wipe();
   //branch_helicopter_single_color(GREEN,100);
   //branch_helicopter_rainbow(40,1,10);//params: nr of rotations total, delay per branch step, color increase per branch step
-  FastLED.delay(5000);
-  trunk_single_color(BLACK);
-  branch_single_color(BLACK);
+  //FastLED.delay(5000);
+  //trunk_single_color(BLACK);
+  //branch_single_color(BLACK);
+  test_sine();
   
   
 }
@@ -110,6 +111,48 @@ void trunk_rainbow_wipe() {
     FastLED.show();
     FastLED.delay(DELAY);
   }
+}
+
+////helper functions for sine calculation////
+
+//returns amplitude modulation term (0...1) based on system time and frequency parameter [1/s]
+float amplitude_modulation(float freq_amp_mod){
+  if (freq_amp_mod == 0) return 1;
+  else return (0.5*(1.0+sinf(freq_amp_mod*2.0*3.1415*float(millis())/1000.0)));
+}
+
+//returns wave propgation term (0...1) based on system time and pixel position
+//parameter: pixel position, phase offset at pos 0 [px], phase shift with time [px/s], wavelength (size of one wave) [px]
+float wave_propagation(float pixel_pos,float phase_offset, float phase_shift_speed, float wavelength){
+  return 0.5*(1.0+sinf(2.0*3.1415*(pixel_pos-phase_offset-phase_shift_speed*float(millis())/1000.0)/wavelength));
+}
+
+//test function for sine effects
+void test_sine() {
+  //set parameters
+  float amplitude = 1; //0...1 -> max brightness
+  float freq_amp_mod = 0.1; //amplitude/brightness modulation [1/s]
+  float wavelength = 12.5;//width of full sine wave along the strip [px]
+  float phase_offset = wavelength/4.0;//wavelength*3.0/4.0; //offset of sine at start [px]
+  float phase_shift_speed = 10;//how fast sine moves along the strip [px/s]
+ 
+  //set trunk
+  phase_offset = wavelength/4.0;
+  for(uint8_t curr_pixel=0; curr_pixel<TRUNK_PIXEL_COUNT/2; curr_pixel++) {
+    for (uint8_t j=0; j<4; j++) {
+
+      set_trunk_led(j, curr_pixel, CHSV(8, 255, 0+int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed, wavelength))));
+    }          
+  }
+ //set branches
+ phase_offset = wavelength/4.0+2;//offset correction for leds in holder
+ for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
+  for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
+    branch_leds[i][j] = CHSV(8, 255, 0+int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed, wavelength)));
+  }
+ }
+ //show
+ FastLED.show(); 
 }
 
 //
