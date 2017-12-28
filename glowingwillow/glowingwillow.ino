@@ -58,16 +58,17 @@ void loop() {
   //FastLED.delay(5000);
   //trunk_single_color(BLACK);
   //branch_single_color(BLACK);
-  test_sine();
+  // test_sine();
+
+
   // tree_rainbow();
   // tree_fade_color(random(255), 255, 0);
 
   // trunk_single_color(PINK);
   // branch_helicopter_single_color(171, 150);
 
-  //run_sparkle();
-  //tree_random();
-  //FastLED.delay(250);
+  // run_sparkle();
+
 }
 
 // -- Transform functions ------------------------------------------------
@@ -168,7 +169,7 @@ void test_sine() {
   }
  }
  //show
- FastLED.show(); 
+ FastLED.show();
 }
 
 //
@@ -274,8 +275,8 @@ void tree_fade_color(int hue, int saturation, int delay) {
 }
 
 // sparkle
-
 struct Sparkle {
+  int start_time;
   int led;
   int branch;
   int value;
@@ -283,27 +284,31 @@ struct Sparkle {
 
 Sparkle sparkles[SPARKLE_COUNT];
 
-
-
 void run_sparkle() {
 
+  int sparkle_min_value = 50;
+  int sparkle_max_value = 200;
+
+  int fade_speed = 10;
+
+  int now = millis();
 
   for (int i=0; i<SPARKLE_COUNT; i++) {
-    if (sparkles[i].value <= 50) {
+    if (sparkles[i].value <= sparkle_min_value) {
       branch_leds[sparkles[i].branch][sparkles[i].led] = BLACK;
 
       // new sparkle
       sparkles[i].led = random(BRANCH_PIXEL_COUNT);
       sparkles[i].branch = random(BRANCH_STRIP_COUNT);
-      sparkles[i].value = random(200);
+      sparkles[i].value = random(sparkle_max_value);
+      sparkles[i].start_time = now;
     } else {
-      sparkles[i].value = sparkles[i].value - 1;
+      sparkles[i].value = sparkles[i].value - (now - sparkles[i].start_time) * fade_speed;
     }
 
     branch_leds[sparkles[i].branch][sparkles[i].led] = CHSV(0, 0, sparkles[i].value);
   }
   FastLED.show();
-
 }
 
 
