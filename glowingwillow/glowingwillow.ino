@@ -67,10 +67,8 @@ void loop() {
   // trunk_single_color(PINK);
   // branch_helicopter_single_color(171, 150);
 
-  // tree_wave(180, 30, 150);
-  // branch_sparkle(5, 250, 500);
-
-
+  tree_wave(180, 30, 130, 8, 25);
+  branch_sparkle(5, 250, 500);
 
   FastLED.show();
 
@@ -302,57 +300,22 @@ void tree_fade_color(int hue, int saturation, int delay) {
   }
 }
 
-void tree_wave(int hue, int min_value, int max_value) {
+void tree_wave(int hue, int min_value, int max_value, int phase_shift_speed, int wavelength) {
   int saturation = 255;
   int value = 0;
 
   for(int i=0; i<4; i++) {
     for(int j=0; j<TRUNK_PIXEL_COUNT/2; j++) {
-      value = min_value + wave_propagation(j, 0, 8, 25) * (max_value-min_value);
+      value = min_value + wave_propagation(j, 0, phase_shift_speed, wavelength) * (max_value-min_value);
       set_trunk_led(i, j, CHSV(hue, saturation, value));
     }
   }
 
   for (int i=0; i<BRANCH_STRIP_COUNT; i++) {
     for(int j=0; j<BRANCH_PIXEL_COUNT; j++) {
-      value = min_value + wave_propagation(j, -50, 8, 25) * (max_value-min_value);
+      value = min_value + wave_propagation(j, -50, phase_shift_speed, wavelength) * (max_value-min_value);
       branch_leds[i][j] = CHSV(hue, saturation, value);
     }
   }
 }
-
-void branch_fade_pixel() {
-
-}
-struct Matrix_Dot {
-  int start_time;
-  int stripe;
-  int led;
-  bool is_white;
-  int value;
-}
-
-struct Matrix_Stripe {
-  int start_time;
-  Matrix_Dot dots[50];
-  int length;
-  int final_length;
-}
-
-Matrix_Stripe matrix_stripes [MATRIX_STRIPE_COUNT];
-
-void the_matrix(int hue) {
-  for(int i=0; i<MATRIX_STRIPE_COUNT; i++) {
-
-    matrix_stripes[i]
-
-
-  }
-}
-
-
-
-
-
-
 
