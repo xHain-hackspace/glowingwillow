@@ -67,8 +67,10 @@ void loop() {
   // trunk_single_color(PINK);
   // branch_helicopter_single_color(171, 150);
 
-  tree_wave(180, 50, 120);
-  branch_sparkle(5, 180, 500);
+  // tree_wave(180, 30, 150);
+  // branch_sparkle(5, 250, 500);
+
+
 
   FastLED.show();
 
@@ -316,6 +318,35 @@ void tree_wave(int hue, int min_value, int max_value) {
       value = min_value + wave_propagation(j, -50, 8, 25) * (max_value-min_value);
       branch_leds[i][j] = CHSV(hue, saturation, value);
     }
+  }
+}
+
+void branch_fade_pixel() {
+
+}
+struct Matrix_Dot {
+  int start_time;
+  int stripe;
+  int led;
+  bool is_white;
+  int value;
+}
+
+struct Matrix_Stripe {
+  int start_time;
+  Matrix_Dot dots[50];
+  int length;
+  int final_length;
+}
+
+Matrix_Stripe matrix_stripes [MATRIX_STRIPE_COUNT];
+
+void the_matrix(int hue) {
+  for(int i=0; i<MATRIX_STRIPE_COUNT; i++) {
+
+    matrix_stripes[i]
+
+
   }
 }
 
