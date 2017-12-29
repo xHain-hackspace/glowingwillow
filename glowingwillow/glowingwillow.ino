@@ -46,8 +46,6 @@ void setup() {
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_4>(branch_leds[3], BRANCH_PIXEL_COUNT);
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_5>(branch_leds[4], BRANCH_PIXEL_COUNT);
   FastLED.addLeds<NEOPIXEL, BRANCH_PIN_6>(branch_leds[5], BRANCH_PIXEL_COUNT);
-
-  trunk_single_color(CHSV(180, 255, 150));
 }
 
 void loop() {
@@ -55,23 +53,13 @@ void loop() {
   //branch_rainbow_wipe();
   //branch_helicopter_single_color(GREEN,100);
   //branch_helicopter_rainbow(40,1,10);//params: nr of rotations total, delay per branch step, color increase per branch step
-  //FastLED.delay(5000);
-  //trunk_single_color(BLACK);
-  //branch_single_color(BLACK);
-  tree_rgb_sines(200,10,11,12,0); //params: wavelengths, phase shift speed r/g/b, "Breathe" frequency
-
-
-  // tree_rainbow();
-  // tree_fade_color(random(255), 255, 0);
-
-  //trunk_single_color(WHITE);
-  //branch_single_color(WHITE);
-  //FastLED.show();
-  // branchh_helicopter_single_color(171, 150);
-
+  //tree_rainbow();
+  //tree_fade_color(random(255), 255, 0);
+  //branchh_helicopter_single_color(171, 150);
   //tree_wave(180, 30, 130, 8, 25);
-  //branch_sparkle(5, 250, 500);
-
+  
+  tree_rgb_sines(25,10.1,11.2,12.2,0.035); //params: wavelengths, phase shift speed r/g/b, "Breathe" frequency
+  branch_sparkle(5, 250, 500);
   FastLED.show();
 
 }
