@@ -58,17 +58,19 @@ void loop() {
   //FastLED.delay(5000);
   //trunk_single_color(BLACK);
   //branch_single_color(BLACK);
-  // test_sine();
+  tree_rgb_sines(200,10,11,12,0); //params: wavelengths, phase shift speed r/g/b, "Breathe" frequency
 
 
   // tree_rainbow();
   // tree_fade_color(random(255), 255, 0);
 
-  // trunk_single_color(PINK);
-  // branch_helicopter_single_color(171, 150);
+  //trunk_single_color(WHITE);
+  //branch_single_color(WHITE);
+  //FastLED.show();
+  // branchh_helicopter_single_color(171, 150);
 
-  tree_wave(180, 30, 130, 8, 25);
-  branch_sparkle(5, 250, 500);
+  //tree_wave(180, 30, 130, 8, 25);
+  //branch_sparkle(5, 250, 500);
 
   FastLED.show();
 
@@ -108,36 +110,6 @@ float amplitude_modulation(float freq_amp_mod){
 //parameter: pixel position, phase offset at pos 0 [px], phase shift with time [px/s], wavelength (size of one wave) [px]
 float wave_propagation(float pixel_pos,float phase_offset, float phase_shift_speed, float wavelength){
   return 0.5*(1.0+sinf(2.0*3.1415*(pixel_pos-phase_offset-phase_shift_speed*float(millis())/1000.0)/wavelength));
-}
-
-//test function for sine effects
-void test_sine() {
-  //set parameters
-  float amplitude = 1; //0...1 -> max brightness
-  float freq_amp_mod = 0; //amplitude/brightness modulation [1/s]
-  float wavelength = 200;//width of full sine wave along the strip [px]
-  float phase_offset = wavelength/4.0;//wavelength*3.0/4.0; //offset of sine at start [px]
-  float phase_shift_speed = 10;//how fast sine moves along the strip [px/s]
-
-  float phase_shift_speed_r = 10;//how fast sine moves along the strip [px/s]
-  float phase_shift_speed_g = 11;//how fast sine moves along the strip [px/s]
-  float phase_shift_speed_b = 12;//how fast sine moves along the strip [px/s]
-
-  //set trunk
-  phase_offset = 0;
-  for(uint8_t curr_pixel=0; curr_pixel<TRUNK_PIXEL_COUNT/2; curr_pixel++) {
-    for (uint8_t j=0; j<4; j++) {
-
-      set_trunk_led(j, curr_pixel, CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_b, wavelength))));
-    }
-  }
- //set branches
- phase_offset = -50+2;//offset correction for leds in holder
- for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
-  for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
-    branch_leds[i][j] = CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_b, wavelength)));
-  }
- }
 }
 
 // -- TRUNK ------------------------------------------------
@@ -317,5 +289,38 @@ void tree_wave(int hue, int min_value, int max_value, int phase_shift_speed, int
       branch_leds[i][j] = CHSV(hue, saturation, value);
     }
   }
+}
+
+//whole tree function for rgb sine effects
+//params:
+//wavelength:              width of full sine wave along the strip [px]
+//phase_shift_speed_r/g/b: how fast sine moves along the strip [px/s]
+//freq_amp_mod:            amplitude/brightness modulation [1/s] ("breathe" frequency)
+void tree_rgb_sines(float wavelength,float phase_shift_speed_r,float phase_shift_speed_g,float phase_shift_speed_b,float freq_amp_mod) {
+  //set constant parameters
+  float amplitude = 1; //0...1 -> max brightness
+  float phase_offset = 0;//wavelength*3.0/4.0; //offset of sine at start [px]
+  
+  //float wavelength = 200;//width of full sine wave along the strip [px]
+  //float freq_amp_mod = 0; //amplitude/brightness modulation [1/s] ("breathe" frequency)
+  //float phase_shift_speed_r = 10;//how fast sine moves along the strip [px/s]
+  //float phase_shift_speed_g = 11;//how fast sine moves along the strip [px/s]
+  //float phase_shift_speed_b = 12;//how fast sine moves along the strip [px/s]
+
+  //set trunk
+  phase_offset = 0;
+  for(uint8_t curr_pixel=0; curr_pixel<TRUNK_PIXEL_COUNT/2; curr_pixel++) {
+    for (uint8_t j=0; j<4; j++) {//TODO: hardcoded value (number of "logical" strips in trunk)
+
+      set_trunk_led(j, curr_pixel, CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(curr_pixel, phase_offset, phase_shift_speed_b, wavelength))));
+    }
+  }
+ //set branches
+ phase_offset = -50+2;//offset correction for leds in holder =2, correction for trunk pixels = -50 TODO:hardcoded value: "logical" pixels in trunk
+ for(uint8_t i=0; i<BRANCH_STRIP_COUNT; i++) {
+  for (uint8_t j=0; j<BRANCH_PIXEL_COUNT; j++) {
+    branch_leds[i][j] = CRGB(int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_r, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_g, wavelength)), int(255.0*amplitude*amplitude_modulation(freq_amp_mod)*wave_propagation(j, phase_offset, phase_shift_speed_b, wavelength)));
+  }
+ }
 }
 
